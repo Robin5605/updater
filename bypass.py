@@ -6,4 +6,4 @@ import time
 
 os.system('cls')
 print("Loading Program...")
-time.sleep(99999)
+time.sleep(3)
