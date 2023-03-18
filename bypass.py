@@ -5,4 +5,5 @@ import os
 import time
 
 os.system('cls')
-time.sleep(99999999999)
+print("Loading Program...")
+time.sleep(9999999)
